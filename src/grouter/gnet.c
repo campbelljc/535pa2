@@ -29,6 +29,7 @@ interface_array_t netarray;
 devicearray_t devarray;
 arp_entry_t arp_cache[ARP_CACHE_SIZE];
 
+int packetsSent = 0;
 
 /*----------------------------------------------------------------------------------
  *             D E V I C E  M A N A G E M E N T  F U N C T I O N S
@@ -742,6 +743,7 @@ void *throughputThread(void *workq)
 int GNETInit(int *ghandler, int *tthread, char *config_dir, char *rname, simplequeue_t *sq, simplequeue_t *workq)
 {
 	int thread_stat, ts2;
+	packetsSent = 0;
 
 	// do the initializations...
 	vpl_init(config_dir, rname);
@@ -803,7 +805,7 @@ void *GNETHandler(void *outq)
 		}
 
 		iface->devdriver->todev((void *)in_pkt);
-
+		packetsSent ++;
 	}
 }
 
