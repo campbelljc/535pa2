@@ -715,6 +715,20 @@ void GNETHalt(int gnethandler)
 	pthread_cancel(gnethandler);
 }
 
+void *throughputThread(void *workq)
+{
+	simplequeue_t *workQ = (simplequeue_t *)workq;
+	
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+	while(1)
+	{
+		sleep(1);
+		pthread_testcancel();
+				
+		verbose(1, "[throughputThread]:: Packets sent (bytes/sec): %d. WORK QUEUE AVG b/s:%f", (packetsSent*1500), getAvgByteRate(workQ));
+		packetsSent = 0;
+	}
+}
 
 /*
  * GNETInit: Initialize the GNET subsystem..
@@ -725,9 +739,9 @@ void GNETHalt(int gnethandler)
  * and injected back into the Output Queue once the ARP reply from a remote machine comes back.
  * This means a packet can go through the Output Queue two times.
  */
-int GNETInit(int *ghandler, char *config_dir, char *rname, simplequeue_t *sq)
+int GNETInit(int *ghandler, int *tthread, char *config_dir, char *rname, simplequeue_t *sq, simplequeue_t *workq)
 {
-	int thread_stat;
+	int thread_stat, ts2;
 
 	// do the initializations...
 	vpl_init(config_dir, rname);
@@ -735,6 +749,7 @@ int GNETInit(int *ghandler, char *config_dir, char *rname, simplequeue_t *sq)
  	GNETInitARPCache();
 
 	thread_stat = pthread_create((pthread_t *)ghandler, NULL, GNETHandler, (void *)sq);
+	ts2 = pthread_create((pthread_t *)tthread, NULL, throughputThread, (void *)workq);
 	if (thread_stat != 0)
 		return EXIT_FAILURE;
 	else

@@ -68,7 +68,7 @@ int main(int ac, char *av[])
 	outputQ = createSimpleQueue("outputQueue", INFINITE_Q_SIZE, 0, 1);
 	workQ = createSimpleQueue("work Queue", INFINITE_Q_SIZE, 0, 1);
 
-	GNETInit(&(rconfig.ghandler), rconfig.config_dir, rconfig.router_name, outputQ);
+	GNETInit(&(rconfig.ghandler), &(rconfig.tthread) rconfig.config_dir, rconfig.router_name, outputQ, workQ);
 	ARPInit();
 	IPInit();
 
@@ -98,6 +98,7 @@ int main(int ac, char *av[])
 	wait4thread(rconfig.scheduler);
 	wait4thread(rconfig.worker);
 	wait4thread(rconfig.ghandler);
+	wait4thread(rconfig.tthread);
 }
 
 
@@ -118,6 +119,7 @@ void shutdownRouter()
 	pthread_cancel(rconfig.worker);
 	verbose(1, "[main]:: shutting down the CLI handler.. ");
 	pthread_cancel(rconfig.clihandler);
+	pthread_cancel(rconfig.tthread);
 
 	// we should cancel CLI thread too??
 	verbose(1, "[main]:: removing the PID files... ");
