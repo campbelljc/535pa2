@@ -163,7 +163,6 @@ void printClassifier(classlist_t *cl)
 	printf("\n\n");
 }
 
-
 int insertIPSpec(classlist_t *clas, char *cname, int srcside, ip_spec_t *ipspec)
 {
 	Lister *lstr;
@@ -210,7 +209,7 @@ int insertProtSpec(classlist_t *clas, char *cname, int prot)
 {
 	Lister *lstr;
 	classdef_t *ptr;
-
+	
 	lstr = lister_create(clas->deftab);
 	while (ptr = ((classdef_t *)lister_next(lstr)))
 	{

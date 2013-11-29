@@ -100,6 +100,7 @@ void *weightedFairScheduler(void *pc)
 // TODO: Debug this function...
 int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize, char *qkey)
 {
+	// get qkey based on using tagPacket(in_pkt) instead of passing as parameter.
 	simplequeue_t *thisq, *nxtq;
 	double minftime, minstime, tweight;
 	List *keylst;

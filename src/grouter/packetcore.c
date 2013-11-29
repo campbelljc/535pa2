@@ -103,7 +103,10 @@ pktcore_t *createPacketCore(char *rname, simplequeue_t *outQ, simplequeue_t *wor
 	pcore->maxqsize = MAX_QUEUE_SIZE;
 	pcore->qdiscs = initQDiscTable();
 	addSimplePolicy(pcore->qdiscs, "taildrop");
-
+	
+	// PA2
+	addClassDef(classifier, "attack");
+	addClassDef(classifier, "iperf");
 
 	if (!(pcore->queues = map_create(NULL)))
 	{

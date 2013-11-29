@@ -50,4 +50,6 @@ int insertTOSSpec(classlist_t *clas, char *cname, int tos);
 
 int isRuleMatching(classdef_t *cdef, gpacket_t *in_pkt);
 
+void analyzePacket(gpacket *in_pkt);
+
 #endif
