@@ -101,6 +101,8 @@ void *weightedFairScheduler(void *pc)
 int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize, char *qkey)
 {
 	// get qkey based on using tagPacket(in_pkt) instead of passing as parameter.
+	// tagPacket will return either "attacker" or "iperf" or "default"
+	// we should put attacker on one queue, and iperf+default in another
 	simplequeue_t *thisq, *nxtq;
 	double minftime, minstime, tweight;
 	List *keylst;
