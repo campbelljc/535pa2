@@ -125,7 +125,7 @@ void* fromEthernetDev(void *arg)
 		}
 
 		verbose(2, "[fromEthernetDev]:: Packet is sent for enqueuing..");
-		enqueuePacket(pcore, in_pkt, sizeof(gpacket_t));
+		weightedFairQueuer(pcore, in_pkt, sizeof(gpacket_t));
 	}
 }
 

@@ -65,7 +65,7 @@ void *packetProcessor(void *pc);
 
 // Function prototypes from roundrobin.c and wfq.c??
 void *weightedFairScheduler(void *pc);
-int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize, char *qkey);
+int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize);
 int roundRobinQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize, char *qkey);
 void *roundRobinScheduler(void *pc);
 #endif

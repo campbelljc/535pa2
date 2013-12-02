@@ -98,9 +98,10 @@ void *weightedFairScheduler(void *pc)
 // WCWeightFairQueuer: function called by the classifier to enqueue
 // the packets.. 
 // TODO: Debug this function...
-int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize, char *qkey)
+int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize)
 {
-	// get qkey based on using tagPacket(in_pkt) instead of passing as parameter.
+	char *qkey = tagPacket(pcore, in_pkt);
+	
 	simplequeue_t *thisq, *nxtq;
 	double minftime, minstime, tweight;
 	List *keylst;
@@ -115,6 +116,7 @@ int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize, char *q
 	{
 		fatal("[weightedFairQueuer]:: Invalid %s key presented for queue addition", qkey);
 		pthread_mutex_unlock(&(pcore->qlock));
+		free(in_pkt);
 		return EXIT_FAILURE;             // packet dropped..
 	}
 
@@ -160,6 +162,7 @@ int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize, char *q
 	} else {
 		verbose(2, "[weightedFairQueuer]:: Packet dropped.. Queue for %s is full ", qkey);
 		pthread_mutex_unlock(&(pcore->qlock));
+		free(in_pkt);
 		return EXIT_SUCCESS;
 	}
 }

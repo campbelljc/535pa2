@@ -118,7 +118,7 @@ void* fromTapDev(void *arg)
 		}
 
 		verbose(2, "[fromTapDev]:: Packet is sent for enqueuing..");
-		enqueuePacket(pcore, in_pkt, sizeof(gpacket_t));
+		weightedFairQueuer(pcore, in_pkt, sizeof(gpacket_t));
 	}
 }
 
