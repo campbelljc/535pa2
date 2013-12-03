@@ -106,10 +106,10 @@ pktcore_t *createPacketCore(char *rname, simplequeue_t *outQ, simplequeue_t *wor
 	
 	// PA2
 	addClassDef(classifier, "attack");
-	addClassDef(classifier, "iperf");
+//	addClassDef(classifier, "iperf");
 
 	insertProtSpec(classifier, "attack", 806);
-	insertProtSpec(classifier, "iperf", 800);
+//	insertProtSpec(classifier, "iperf", 800);
 
 	if (!(pcore->queues = map_create(NULL)))
 	{
