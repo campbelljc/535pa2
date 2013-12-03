@@ -57,9 +57,14 @@ void *weightedFairScheduler(void *pc)
 
 		// if savekey is NULL then release the lock..
 		if (savekey == NULL)
+		{
+			printf("savekey == NULL");
 			continue;
+		}
 		else
 		{
+			printf("Recalculating queue times");			
+
 			thisq = map_get(pcore->queues, savekey);
 			readQueue(thisq, (void **)&in_pkt, &pktsize);
 			writeQueue(pcore->workQ, in_pkt, pktsize);
@@ -70,6 +75,8 @@ void *weightedFairScheduler(void *pc)
 			peekQueue(thisq, (void **)&nxt_pkt, &npktsize);
 			if (npktsize)
 			{
+				printf("Setting queue times");
+
 				thisq->stime = thisq->ftime;
 				thisq->ftime = thisq->stime + npktsize/thisq->weight;
 			}
