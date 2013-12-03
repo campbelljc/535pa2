@@ -119,7 +119,7 @@ int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize)
 		return EXIT_FAILURE;             // packet dropped..
 	}
 
-	printf("Checking the queue size \n");
+//	printf("Checking the queue size \n");
 	if (thisq->cursize == 0)
 	{
 		verbose(2, "[weightedFairQueuer]:: inserting the first element.. ");
