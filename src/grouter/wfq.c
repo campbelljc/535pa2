@@ -169,13 +169,21 @@ int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize)
 
 		pcore->vclock = max(minstime, pcore->vclock);
 		// insert the packet... and increment variables..
-		writeQueue(thisq, in_pkt, pktsize);
-		pcore->packetcnt++;
+	//	writeQueue(thisq, in_pkt, pktsize);
+	//	pcore->packetcnt++;
 
 		// wake up scheduler if it was waiting..
+		pcore->packetcnt++;
 		if (pcore->packetcnt == 1)
-			pthread_cond_signal(&(pcore->schwaiting));
+			pthread_cond_signal(&(pcore->schwaiting)); // wake up scheduler if it was waiting..
 		pthread_mutex_unlock(&(pcore->qlock));
+		verbose(1, "[weightedfairqueuer]:: Adding packet.. ");
+		writeQueue(thisq, in_pkt, pktsize);
+		
+		
+	//	if (pcore->packetcnt == 1)
+	//		pthread_cond_signal(&(pcore->schwaiting));
+	//	pthread_mutex_unlock(&(pcore->qlock));
 		return EXIT_SUCCESS;
 	} else if (thisq->cursize < thisq->maxsize)
 	{
