@@ -281,7 +281,7 @@ int compareIP2Spec(uchar ip[], ip_spec_t *ips)
 
 int compareProt2Spec(int prot, int pspec)
 {
-	verbose(1, "Checking packet prot %d against spec prot %d", prot, pspec);
+//	verbose(1, "Checking packet prot %d against spec prot %d", prot, pspec);
 	if (pspec == 0) return 1;
 	if (prot == pspec) return 1;
 	return 0;
@@ -295,6 +295,13 @@ int compareTos2Spec(int tos, int tspec)
 	return 0;
 }
 
+int compareLen2Spec(int plen, int lspec)
+{
+	verbose(1, "Checking packet len %d against spec len %d", prot, pspec);
+	if (lspec == 0) return 1;
+	if (plen == lspec) return 1;
+	return 0;
+}
 
 /*
  * TODO: What happened to the port range check? Not implemented?
@@ -308,5 +315,6 @@ int isRuleMatching(classdef_t *cdef, gpacket_t *in_pkt)
 	return compareIP2Spec(ip_pkt->ip_src, cdef->srcspec) *
 		compareIP2Spec(ip_pkt->ip_dst, cdef->dstspec) *
 		compareProt2Spec(ip_pkt->ip_prot, cdef->prot) *
-		compareTos2Spec(ip_pkt->ip_tos, cdef->tos);
+		compareTos2Spec(ip_pkt->ip_tos, cdef->tos) *
+		compareLen2Spec(ip_pkt->ip_pkt_len, cdef->plength);
 }

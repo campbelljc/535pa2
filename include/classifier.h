@@ -20,6 +20,7 @@ typedef struct _classdef_t
 	port_range_t *dstports;
 	int prot;
 	int tos;
+	int plength;
 	char cname[MAX_NAME_LEN];
 	int cdefid;
 } classdef_t;
@@ -47,6 +48,7 @@ int insertIPSpec(classlist_t *clas, char *cname, int srcside, ip_spec_t *ipspec)
 int insertPortRangeSpec(classlist_t *clas, char *cnarm, int srcside, port_range_t *prspec);
 int insertProtSpec(classlist_t *clas, char *cname, int prot);
 int insertTOSSpec(classlist_t *clas, char *cname, int tos);
+int insertLengthSpec(classlist_t *clas, char *cname, int plen);
 
 int isRuleMatching(classdef_t *cdef, gpacket_t *in_pkt);
 
