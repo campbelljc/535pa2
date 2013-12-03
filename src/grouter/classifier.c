@@ -309,8 +309,3 @@ int isRuleMatching(classdef_t *cdef, gpacket_t *in_pkt)
 		compareProt2Spec(ip_pkt->ip_prot, cdef->prot) *
 		compareTos2Spec(ip_pkt->ip_tos, cdef->tos);
 }
-
-void analyzePacket(gpacket_t *in_pkt)
-{
-	//not sure if we need this
-}

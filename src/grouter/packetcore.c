@@ -397,14 +397,16 @@ char *tagPacket(pktcore_t *pcore, gpacket_t *in_pkt)
 
 	for (j = 0; j < pcore->pcache->numofentries; j++)
 	{
-
 		qname = pcore->pcache->cname[j];
+		verbose(1, "Queue being looked at: %s", qname);
 		if (!strcmp(qname, "default"))
 			continue;
 		if ((cdef = getClassDef(classifier, qname)))
 		{
+			verbose(1, "Getting class def %s...", cdef->cname);
 			if (isRuleMatching(cdef, in_pkt))
 			{
+				verbose(1, "MATCH");
 				found = TRUE;
 				break;
 			}
