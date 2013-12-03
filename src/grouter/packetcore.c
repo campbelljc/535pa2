@@ -316,7 +316,7 @@ pthread_t PktCoreSchedulerInit(pktcore_t *pcore)
 	int threadstat;
 	pthread_t threadid;
 
-//	threadstat = pthread_create((pthread_t *)&threadid, NULL, (void *)weightedFairScheduler, (void *)pcore);
+	threadstat = pthread_create((pthread_t *)&threadid, NULL, (void *)weightedFairScheduler, (void *)pcore);
 	if (threadstat != 0)
 	{
 		verbose(1, "[PKTCoreSchedulerInit]:: unable to create thread.. ");
