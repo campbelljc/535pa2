@@ -101,6 +101,7 @@ void *weightedFairScheduler(void *pc)
 int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize)
 {
 	char *qkey = tagPacket(pcore, in_pkt);
+	printf("-- QKEY: %s --", qkey);
 	simplequeue_t *thisq, *nxtq;
 	double minftime, minstime, tweight;
 	List *keylst;
