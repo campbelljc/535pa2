@@ -27,6 +27,7 @@ void *weightedFairScheduler(void *pc)
 	double minftime, minstime, tweight;
 	int pktsize, npktsize;
 	gpacket_t *in_pkt, *nxt_pkt;
+	minftime = 30000;
 
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);       // die as soon as cancelled
 	while (1)
