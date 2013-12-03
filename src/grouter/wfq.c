@@ -32,69 +32,87 @@ void *weightedFairScheduler(void *pc)
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);       // die as soon as cancelled
 	while (1)
 	{
-		verbose(2, "[weightedFairScheduler]:: Worst-case weighted fair queuing scheduler processing..");
+		verbose(1, "[weightedFairScheduler]:: Worst-case weighted fair queuing scheduler processing..");
 
 		pthread_mutex_lock(&(pcore->qlock));
-		if (pcore->packetcnt == 0)
-			pthread_cond_wait(&(pcore->schwaiting), &(pcore->qlock));
+printf("13.1\n");	
+		if (pcore->packetcnt == 0){
+printf("13.2\n");		
+			pthread_cond_wait(&(pcore->schwaiting), &(pcore->qlock));}
+printf("13.3\n");	
 		pthread_mutex_unlock(&(pcore->qlock));
-
+printf("13.4\n");	
 		pthread_testcancel();
-
+printf("13.5\n");	
 		keylst = map_keys(pcore->queues);
+printf("14\n");	
 		while (list_has_next(keylst) == 1)
 		{
+printf("15\n");	
 			nxtkey = list_next(keylst);
 			nxtq = map_get(pcore->queues, nxtkey);
 			if (nxtq->cursize == 0)
 				continue;
 			if ((nxtq->stime <= pcore->vclock) && (nxtq->ftime < minftime))
 			{
+				printf("entered minftime if\n");
 				savekey = nxtkey;
 				minftime = nxtq->ftime;
 			}
 		}
+		printf("ended loop\n");
 		list_release(keylst);
-
+		printf("released list\n");
 		// if savekey is NULL then release the lock..
 		if (savekey == NULL)
 		{
-			printf("savekey == NULL");
+			printf("savekey == NULL\n");
 			continue;
 		}
 		else
 		{
-			printf("Recalculating queue times");			
+			printf("Recalculating queue times\n");			
 
 			thisq = map_get(pcore->queues, savekey);
+printf("1\n");	
 			readQueue(thisq, (void **)&in_pkt, &pktsize);
+printf("2\n");	
 			writeQueue(pcore->workQ, in_pkt, pktsize);
+printf("3\n");	
 			pthread_mutex_lock(&(pcore->qlock));
+printf("4\n");	
 			pcore->packetcnt--;
+printf("5\n");	
 			pthread_mutex_unlock(&(pcore->qlock));
+printf("6\n");	
 
 			peekQueue(thisq, (void **)&nxt_pkt, &npktsize);
+printf("7\n");	
 			if (npktsize)
 			{
-				printf("Setting queue times");
+				printf("Setting queue times\n");
 
 				thisq->stime = thisq->ftime;
 				thisq->ftime = thisq->stime + npktsize/thisq->weight;
 			}
-
+printf("8\n");	
 			minstime = thisq->stime;
 			tweight = 0.0;
-		
+printf("9\n");			
 			keylst = map_keys(pcore->queues);
 			while (list_has_next(keylst) == 1)
-			{
+			{	printf("while 10\n");	
+
 				nxtkey = list_next(keylst);
 				nxtq = map_get(pcore->queues, nxtkey);
 				tweight += nxtq->weight;
 				if ((nxtq->cursize > 0) && (nxtq->stime < minstime))
 					minstime = nxtq->stime;
+				printf("end while 11\n");	
 			}
+			printf("12\n");	
 			list_release(keylst);
+printf("13\n");	
 			pcore->vclock = max(minstime, (pcore->vclock + ((double)pktsize)/tweight));
 		}
 	}
