@@ -281,6 +281,7 @@ int compareIP2Spec(uchar ip[], ip_spec_t *ips)
 
 int compareProt2Spec(int prot, int pspec)
 {
+	verbose(1, "Checking packet prot %d against spec prot %d", prot, pspec);
 	if (pspec == 0) return 1;
 	if (prot == pspec) return 1;
 	return 0;
