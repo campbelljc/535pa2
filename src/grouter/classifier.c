@@ -297,7 +297,7 @@ int compareTos2Spec(int tos, int tspec)
 
 int compareLen2Spec(int plen, int lspec)
 {
-	verbose(1, "Checking packet len %d against spec len %d", prot, pspec);
+	verbose(1, "Checking packet len %d against spec len %d", plen, lspec);
 	if (lspec == 0) return 1;
 	if (plen == lspec) return 1;
 	return 0;
