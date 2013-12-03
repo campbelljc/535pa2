@@ -242,6 +242,25 @@ int insertTOSSpec(classlist_t *clas, char *cname, int tos)
 
 }
 
+int insertLengthSpec(classlist_t *clas, char *cname, int plen)
+{
+	Lister *lstr;
+	classdef_t *ptr;
+
+	lstr = lister_create(clas->deftab);
+	while (ptr = ((classdef_t *)lister_next(lstr)))
+	{
+		if (!strcmp(ptr->cname, cname))
+		{
+			ptr->plength = plen;
+			break;
+		}
+	}
+	lister_release(lstr);
+	return 1;
+
+}
+
 
 int compareIP2Spec(uchar ip[], ip_spec_t *ips)
 {
