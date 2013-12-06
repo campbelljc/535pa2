@@ -76,17 +76,19 @@ printf("15\n");
 
 			thisq = map_get(pcore->queues, savekey);
 printf("1\n");	
-			readQueue(thisq, (void **)&in_pkt, &pktsize);
-printf("2\n");	
-			writeQueue(pcore->workQ, in_pkt, pktsize);
-printf("3\n");	
-			pthread_mutex_lock(&(pcore->qlock));
-printf("4\n");	
-			pcore->packetcnt--;
-printf("5\n");	
-			pthread_mutex_unlock(&(pcore->qlock));
-printf("6\n");	
-
+			int status = readQueue(thisq, (void **)&in_pkt, &pktsize);
+			if (status == EXIT_SUCCESS)
+			{
+				printf("2\n");	
+				writeQueue(pcore->workQ, in_pkt, pktsize);			
+				printf("3\n");	
+				pthread_mutex_lock(&(pcore->qlock));
+				printf("4\n");	
+				pcore->packetcnt--;
+				printf("5\n");	
+				pthread_mutex_unlock(&(pcore->qlock));
+				printf("6\n");	
+			}
 			peekQueue(thisq, (void **)&nxt_pkt, &npktsize);
 printf("7\n");	
 			if (npktsize)
