@@ -34,8 +34,6 @@ void *weightedFairScheduler(void *pc)
 	{
 		verbose(1, "[weightedFairScheduler]:: Worst-case WFQ scheduler processing...");
 
-		activeQueueCnt = 0;
-
 		pthread_mutex_lock(&(pcore->qlock));
 //printf("13.1\n");	
 		if (pcore->packetcnt == 0){
