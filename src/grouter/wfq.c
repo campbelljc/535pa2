@@ -65,7 +65,7 @@ void *weightedFairScheduler(void *pc)
 			}
 
 			verbose(2, "Checking if %s->stime=%f <= pcore->vclock=%f && %s->ftime=%f < minftime=%f", nxtkey, nxtq->stime, pcore->vclock, nxtkey, nxtq->ftime, minftime);
-			if ((nxtq->stime <= pcore->vclock) && (nxtq->ftime < minftime || minftime == -1))
+			if ((nxtq->stime <= pcore->vclock || pcore -> vclock == -1) && (nxtq->ftime < minftime || minftime == -1))
 			{
 				verbose(2, "entered minftime if\n");
 				savekey = nxtkey;
@@ -81,6 +81,7 @@ void *weightedFairScheduler(void *pc)
 		if (savekey == NULL)
 		{
 			minftime = -1;
+			pcore -> vclock = -1;
 //			printf("savekey == NULL\n");
 			continue;
 		}
