@@ -52,17 +52,17 @@ void *weightedFairScheduler(void *pc)
 //printf("15\n");	
 //			savekey = NULL;
 			nxtkey = list_next(keylst);
-//			verbose(1, "Looking at queue %s.", nxtkey);
+			verbose(2, "Looking at queue %s.", nxtkey);
 			nxtq = map_get(pcore->queues, nxtkey);
 			if (nxtq->cursize == 0)
 			{
-//				verbose(1, "Is empty.");
+				verbose(2, "Is empty.");
 				continue;
 			}
-//			verbose(1, "Checking if %s->stime=%f <= pcore->vclock=%f && %s->ftime=%f < minftime=%f", nxtkey, nxtq->stime, pcore->vclock, nxtkey, nxtq->ftime, minftime);
+			verbose(2, "Checking if %s->stime=%f <= pcore->vclock=%f && %s->ftime=%f < minftime=%f", nxtkey, nxtq->stime, pcore->vclock, nxtkey, nxtq->ftime, minftime);
 			if ((nxtq->stime <= pcore->vclock) && (nxtq->ftime < minftime))
 			{
-//				printf("entered minftime if\n");
+				verbose(2, "entered minftime if\n");
 				savekey = nxtkey;
 				minftime = nxtq->ftime;
 			}
