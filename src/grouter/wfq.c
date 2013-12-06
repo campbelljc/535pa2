@@ -75,7 +75,7 @@ void *weightedFairScheduler(void *pc)
 	//		printf("Recalculating queue times\n");			
 
 			thisq = map_get(pcore->queues, savekey);
-printf("1\n");	
+//printf("1\n");	
 			int status = readQueue(thisq, (void **)&in_pkt, &pktsize);
 			if (status == EXIT_SUCCESS)
 			{
@@ -135,7 +135,7 @@ int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize)
 	List *keylst;
 	char *nxtkey, *savekey;
 
-	verbose(2, "[weightedFairQueuer]:: Worst-case weighted fair queuing scheduler processing..");
+	verbose(1, "[weightedFairQueuer]:: Worst-case weighted fair queuing scheduler processing packet w/key %s", qkey);
 
 	pthread_mutex_lock(&(pcore->qlock));
 
@@ -151,7 +151,7 @@ int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize)
 //	printf("Checking the queue size \n");
 	if (thisq->cursize == 0)
 	{
-		verbose(2, "[weightedFairQueuer]:: inserting the first element.. ");
+		verbose(1, "[weightedFairQueuer]:: inserting the first element.. ");
 		thisq->stime = max(pcore->vclock, thisq->ftime);
 		thisq->ftime = thisq->stime + pktsize/thisq->weight;
 
