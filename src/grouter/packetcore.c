@@ -129,7 +129,7 @@ int addPktCoreQueue(pktcore_t *pcore, char *qname, char *qdisc, double qweight, 
 	qentrytype_t *qentry;
 
 
-	if ((pktq = createSimpleQueue(qname, pcore->maxqsize, 0, 0)) == NULL)
+	if ((pktq = createSimpleQueue(qname, pcore->maxqsize, 0, 1)) == NULL)
 	{
 		error("[addPktCoreQueue]:: packet queue creation failed.. ");
 		return EXIT_FAILURE;
