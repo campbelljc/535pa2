@@ -53,7 +53,7 @@ void *weightedFairScheduler(void *pc)
 //printf("15\n");	
 			nxtkey = list_next(keylst);
 			nxtq = map_get(pcore->queues, nxtkey);
-			if (nxtq->cursize == 0)
+			if (nxtq->cursize <= 0)
 				continue;
 			if ((nxtq->stime <= pcore->vclock) && (nxtq->ftime < minftime))
 			{

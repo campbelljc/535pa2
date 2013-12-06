@@ -169,9 +169,11 @@ int readQueue(simplequeue_t *msgqueue, void **data, int *size)
 			swrap->data = NULL;
 			msgqueue->cursize--;
 			msgqueue->bytesleft -= *size;
+// printf("block on read\n");
 			rvalue = EXIT_SUCCESS;
 		} else
 		{
+// printf("no block on read, cursize = %d\n", msgqueue -> cursize);
 			*data = NULL;
 			*size = 0;
 			rvalue = EXIT_FAILURE;
