@@ -50,7 +50,7 @@ void *weightedFairScheduler(void *pc)
 		while (list_has_next(keylst) == 1)
 		{
 //printf("15\n");	
-			savekey = NULL;
+//			savekey = NULL;
 			nxtkey = list_next(keylst);
 			verbose(1, "Looking at queue %s.", nxtkey);
 			nxtq = map_get(pcore->queues, nxtkey);
