@@ -67,6 +67,7 @@ void *weightedFairScheduler(void *pc)
 				minftime = nxtq->ftime;
 			}
 		}
+		if (nxtq->cursize == 0) minftime = 30000;
 	//	printf("ended loop\n");
 		list_release(keylst);
 	//	printf("released list\n");
