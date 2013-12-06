@@ -32,24 +32,25 @@ void *weightedFairScheduler(void *pc)
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);       // die as soon as cancelled
 	while (1)
 	{
-		verbose(1, "[weightedFairScheduler]:: Worst-case weighted fair queuing scheduler processing..");
+		verbose(1, "[weightedFairScheduler]:: Worst-case WFQ scheduler processing...");
 
 		pthread_mutex_lock(&(pcore->qlock));
-printf("13.1\n");	
+//printf("13.1\n");	
 		if (pcore->packetcnt == 0){
-printf("13.2\n");		
+
+//printf("13.2\n");		
 			pthread_cond_wait(&(pcore->schwaiting), &(pcore->qlock));
 		}
-printf("13.3\n");	
+//printf("13.3\n");	
 		pthread_mutex_unlock(&(pcore->qlock));
-printf("13.4\n");	
+//printf("13.4\n");	
 		pthread_testcancel();
-printf("13.5\n");	
+//printf("13.5\n");	
 		keylst = map_keys(pcore->queues);
-printf("14\n");	
+//printf("14\n");	
 		while (list_has_next(keylst) == 1)
 		{
-printf("15\n");	
+//printf("15\n");	
 			nxtkey = list_next(keylst);
 			nxtq = map_get(pcore->queues, nxtkey);
 			if (nxtq->cursize == 0)
@@ -61,9 +62,9 @@ printf("15\n");
 				minftime = nxtq->ftime;
 			}
 		}
-		printf("ended loop\n");
+	//	printf("ended loop\n");
 		list_release(keylst);
-		printf("released list\n");
+	//	printf("released list\n");
 		// if savekey is NULL then release the lock..
 		if (savekey == NULL)
 		{
@@ -76,17 +77,19 @@ printf("15\n");
 
 			thisq = map_get(pcore->queues, savekey);
 printf("1\n");	
-			readQueue(thisq, (void **)&in_pkt, &pktsize);
-printf("2\n");	
-			writeQueue(pcore->workQ, in_pkt, pktsize);
-printf("3\n");	
-			pthread_mutex_lock(&(pcore->qlock));
-printf("4\n");	
-			pcore->packetcnt--;
-printf("5\n");	
-			pthread_mutex_unlock(&(pcore->qlock));
-printf("6\n");	
-
+			int status = readQueue(thisq, (void **)&in_pkt, &pktsize);
+			if (status == EXIT_SUCCESS)
+			{
+				printf("2\n");	
+				writeQueue(pcore->workQ, in_pkt, pktsize);			
+				printf("3\n");	
+				pthread_mutex_lock(&(pcore->qlock));
+				printf("4\n");	
+				pcore->packetcnt--;
+				printf("5\n");	
+				pthread_mutex_unlock(&(pcore->qlock));
+				printf("6\n");	
+			}
 			peekQueue(thisq, (void **)&nxt_pkt, &npktsize);
 printf("7\n");	
 			if (npktsize)
@@ -113,7 +116,7 @@ printf("9\n");
 			}
 			printf("12\n");	
 			list_release(keylst);
-printf("13\n");	
+//printf("13\n");	
 			pcore->vclock = max(minstime, (pcore->vclock + ((double)pktsize)/tweight));
 		}
 	}
