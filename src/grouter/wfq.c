@@ -27,7 +27,7 @@ void *weightedFairScheduler(void *pc)
 	double minftime, minstime, tweight;
 	int pktsize, npktsize;
 	gpacket_t *in_pkt, *nxt_pkt;
-	minftime = 30000;
+	minftime = -1;
 
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);       // die as soon as cancelled
 	while (1)
@@ -60,14 +60,14 @@ void *weightedFairScheduler(void *pc)
 				continue;
 			}
 			verbose(2, "Checking if %s->stime=%f <= pcore->vclock=%f && %s->ftime=%f < minftime=%f", nxtkey, nxtq->stime, pcore->vclock, nxtkey, nxtq->ftime, minftime);
-			if ((nxtq->stime <= pcore->vclock) && (nxtq->ftime < minftime))
+			if ((nxtq->stime <= pcore->vclock) && (nxtq->ftime < minftime || minftime == -1))
 			{
 				verbose(2, "entered minftime if\n");
 				savekey = nxtkey;
 				minftime = nxtq->ftime;
 			}
 		}
-		if (nxtq->cursize == 0) minftime = 30000;
+		if (nxtq->cursize == 0) minftime = -1;
 	//	printf("ended loop\n");
 		list_release(keylst);
 	//	printf("released list\n");
