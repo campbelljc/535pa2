@@ -72,7 +72,7 @@ void *weightedFairScheduler(void *pc)
 		}
 		else
 		{
-			printf("Recalculating queue times\n");			
+	//		printf("Recalculating queue times\n");			
 
 			thisq = map_get(pcore->queues, savekey);
 printf("1\n");	
@@ -98,22 +98,22 @@ printf("7\n");
 				thisq->stime = thisq->ftime;
 				thisq->ftime = thisq->stime + npktsize/thisq->weight;
 			}
-printf("8\n");	
+//printf("8\n");	
 			minstime = thisq->stime;
 			tweight = 0.0;
-printf("9\n");			
+//printf("9\n");			
 			keylst = map_keys(pcore->queues);
 			while (list_has_next(keylst) == 1)
-			{	printf("while 10\n");	
+			{//	printf("while 10\n");	
 
 				nxtkey = list_next(keylst);
 				nxtq = map_get(pcore->queues, nxtkey);
 				tweight += nxtq->weight;
 				if ((nxtq->cursize > 0) && (nxtq->stime < minstime))
 					minstime = nxtq->stime;
-				printf("end while 11\n");	
+		//		printf("end while 11\n");	
 			}
-			printf("12\n");	
+	//		printf("12\n");	
 			list_release(keylst);
 //printf("13\n");	
 			pcore->vclock = max(minstime, (pcore->vclock + ((double)pktsize)/tweight));
