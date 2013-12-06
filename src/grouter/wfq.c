@@ -58,6 +58,7 @@ void *weightedFairScheduler(void *pc)
 				verbose(1, "Is empty.");
 				continue;
 			}
+			verbose(1, "Checking if %s->stime=%d <= pcore->vclock=%d && %s->ftime=%d < minftime=%d", nxtkey, nxtq->stime, pcore->vclock, nxtkey, nxtq->ftime, minftime);
 			if ((nxtq->stime <= pcore->vclock) && (nxtq->ftime < minftime))
 			{
 				printf("entered minftime if\n");
