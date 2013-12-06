@@ -407,7 +407,7 @@ char *tagPacket(pktcore_t *pcore, gpacket_t *in_pkt)
 	//		verbose(1, "Getting class def %s...", cdef->cname);
 			if (isRuleMatching(cdef, in_pkt))
 			{
-				verbose(1, "MATCH");
+			//	verbose(1, "MATCH");
 				found = TRUE;
 				break;
 			}
