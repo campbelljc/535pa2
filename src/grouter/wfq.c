@@ -73,7 +73,7 @@ void *weightedFairScheduler(void *pc)
 		else
 		{
 	//		printf("Recalculating queue times\n");			
-
+			verbose(1, "Scheduler looking at queue %s", savekey);
 			thisq = map_get(pcore->queues, savekey);
 //printf("1\n");	
 			int status = readQueue(thisq, (void **)&in_pkt, &pktsize);
@@ -192,11 +192,12 @@ int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize)
 	{
 		// insert packet and setup variables..
 		writeQueue(thisq, in_pkt, pktsize);
+		verbose(1, "[weightedfairqueuer]:: Adding packet.. ");
 		pcore->packetcnt++;
 		pthread_mutex_unlock(&(pcore->qlock));
 		return EXIT_SUCCESS;
 	} else {
-		verbose(2, "[weightedFairQueuer]:: Packet dropped.. Queue for %s is full ", qkey);
+		verbose(1, "[weightedFairQueuer]:: Packet dropped.. Queue for %s is full ", qkey);
 		pthread_mutex_unlock(&(pcore->qlock));
 		free(in_pkt);
 		return EXIT_SUCCESS;
