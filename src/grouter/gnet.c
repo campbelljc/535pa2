@@ -726,7 +726,7 @@ void *throughputThread(void *workq)
 		sleep(1);
 		pthread_testcancel();
 				
-		verbose(1, "[throughputThread]:: Packets sent (bytes/sec): %d. WORK QUEUE AVG b/s:%f", (packetsSent*1500), getAvgByteRate(workQ));
+		verbose(2, "[throughputThread]:: Packets sent (bytes/sec): %d. WORK QUEUE AVG b/s:%f", (packetsSent*1500), getAvgByteRate(workQ));
 		packetsSent = 0;
 	}
 }
