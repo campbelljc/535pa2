@@ -111,7 +111,7 @@ void *weightedFairScheduler(void *pc)
 //				printf("Setting queue times\n");
 
 				thisq->stime = thisq->ftime;
-				thisq->ftime = thisq->stime + npktsize/thisq->weight;
+				thisq->ftime = thisq->stime + npktsize/(thisq->weight * 10000);
 			}
 //printf("8\n");	
 			minstime = thisq->stime;
@@ -123,7 +123,7 @@ void *weightedFairScheduler(void *pc)
 
 				nxtkey = list_next(keylst);
 				nxtq = map_get(pcore->queues, nxtkey);
-				tweight += nxtq->weight;
+				tweight += (nxtq->weight * 10000);
 				if ((nxtq->cursize > 0) && (nxtq->stime < minstime))
 					minstime = nxtq->stime;
 		//		printf("end while 11\n");	
