@@ -28,11 +28,14 @@ void *weightedFairScheduler(void *pc)
 	int pktsize, npktsize;
 	gpacket_t *in_pkt, *nxt_pkt;
 	minftime = 30000;
+	int activeQueueCnt;
 
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);       // die as soon as cancelled
 	while (1)
 	{
 		verbose(1, "[weightedFairScheduler]:: Worst-case WFQ scheduler processing...");
+
+		activeQueueCnt = 0;
 
 		pthread_mutex_lock(&(pcore->qlock));
 //printf("13.1\n");	
@@ -61,6 +64,9 @@ void *weightedFairScheduler(void *pc)
 				verbose(1, "Is empty.");
 				continue;
 			}
+			
+			activeQueueCnt++;
+
 			verbose(1, "Checking if %s->stime=%f <= pcore->vclock=%f && %s->ftime=%f < minftime=%f", nxtkey, nxtq->stime, pcore->vclock, nxtkey, nxtq->ftime, minftime);
 			if ((nxtq->stime <= pcore->vclock) && (nxtq->ftime < minftime))
 			{
