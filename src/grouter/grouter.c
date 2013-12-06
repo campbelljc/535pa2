@@ -79,7 +79,7 @@ int main(int ac, char *av[])
 
 	// add a default Queue.. the createClassifier has already added a rule with "default" tag
 	// char *qname, char *dqisc, double qweight, double delay_us, int nslots);
-	addPktCoreQueue(pcore, "attack", "taildrop", 4.0, 2.0, 0);
+	addPktCoreQueue(pcore, "attack", "taildrop", 1.0, 2.0, 0);
 	addPktCoreQueue(pcore, "default", "taildrop", 5.0, 2.0, 0);
 	rconfig.scheduler = PktCoreSchedulerInit(pcore);
 	rconfig.worker = PktCoreWorkerInit(pcore);
