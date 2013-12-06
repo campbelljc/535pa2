@@ -38,7 +38,7 @@ void *weightedFairScheduler(void *pc)
 printf("13.1\n");	
 		if (pcore->packetcnt == 0){
 printf("13.2\n");		
-			//pthread_cond_wait(&(pcore->schwaiting), &(pcore->qlock));
+			pthread_cond_wait(&(pcore->schwaiting), &(pcore->qlock));
 		}
 printf("13.3\n");	
 		pthread_mutex_unlock(&(pcore->qlock));
