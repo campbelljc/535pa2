@@ -49,7 +49,9 @@ void *weightedFairScheduler(void *pc)
 			nxtkey = list_next(keylst);
 			verbose(2, "Looking at queue %s", nxtkey);
 			nxtq = map_get(pcore->queues, nxtkey);
+
 			verbose(2, "Size:  %d", nxtq->cursize);
+
 			if (nxtq->cursize == 0)
 			{
 				verbose(2, "Is empty.");
@@ -118,6 +120,91 @@ void *weightedFairScheduler(void *pc)
 }
 
 
+/*
+void *weightedFairScheduler(void *pc)
+{
+	pktcore_t *pcore = (pktcore_t *)pc;
+	List *keylst;
+	simplequeue_t *nxtq, *thisq;
+	char *nxtkey, *savekey;
+	double tweight;
+	int pktsize, npktsize;
+	gpacket_t *in_pkt, *nxt_pkt;
+
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);       // die as soon as cancelled
+	while (1)
+	{
+		savekey = NULL;
+
+		verbose(2, "[weightedFairScheduler]:: Worst-case WFQ scheduler processing...");
+
+		pthread_mutex_lock(&(pcore->qlock));
+		if (pcore->packetcnt == 0)
+		{
+			pthread_cond_wait(&(pcore->schwaiting), &(pcore->qlock));
+		}
+		pthread_mutex_unlock(&(pcore->qlock));
+
+		pthread_testcancel();
+		
+		int totalWeights = 0;
+		keylst = map_keys(pcore->queues);
+		while (list_has_next(keylst) == 1)
+		{
+			nxtkey = list_next(keylst);
+			nxtq = map_get(pcore->queues, nxtkey);
+			totalWeights += nxtq->weight;
+		}
+		list_release(keylst);
+
+		keylst = map_keys(pcore->queues);
+		while (list_has_next(keylst) == 1)
+		{
+			nxtkey = list_next(keylst);
+			verbose(2, "Looking at queue %s.", nxtkey);
+			nxtq = map_get(pcore->queues, nxtkey);
+
+			if (nxtq->cursize == 0)
+			{
+				verbose(2, "Is empty.");
+				continue;
+			}
+			
+			if (nxtq->weightAchieved < nxtq->weight)
+			{
+				savekey = nxtkey;
+				nxtq->weightAchieved += 1; // fix for weight
+				break;
+			}
+		}
+		list_release(keylst);
+
+		if (savekey == NULL)
+		{
+			continue;
+		}
+		thisq = map_get(pcore->queues, savekey);
+
+		int status = readQueue(thisq, (void **)&in_pkt, &pktsize);
+		writeQueue(pcore->workQ, in_pkt, pktsize);			
+		pthread_mutex_lock(&(pcore->qlock));
+		pcore->packetcnt--;
+		pthread_mutex_unlock(&(pcore->qlock));
+	
+		pcore->vclock += 1;
+		if (pcore->vclock >= totalWeights)
+		{
+			pcore->vclock = 0;
+			while (list_has_next(keylst) == 1)
+			{
+				nxtkey = list_next(keylst);
+				nxtq = map_get(pcore->queues, nxtkey);
+				nxtq->weightAchieved = 0;
+			}
+			list_release(keylst);
+		}
+	}
+} */
 
 
 // WCWeightFairQueuer: function called by the classifier to enqueue
