@@ -37,27 +37,19 @@ void *weightedFairScheduler(void *pc)
 		verbose(2, "[weightedFairScheduler]:: Worst-case WFQ scheduler processing...");
 
 		pthread_mutex_lock(&(pcore->qlock));
-//printf("13.1\n");	
 		if (pcore->packetcnt == 0){
-
-//printf("13.2\n");		
 			pthread_cond_wait(&(pcore->schwaiting), &(pcore->qlock));
 		}
-//printf("13.3\n");	
 		pthread_mutex_unlock(&(pcore->qlock));
-//printf("13.4\n");	
 		pthread_testcancel();
-//printf("13.5\n");	
 		keylst = map_keys(pcore->queues);
-//printf("14\n");	
 		while (list_has_next(keylst) == 1)
 		{
-//printf("15\n");	
 //			savekey = NULL;
 			nxtkey = list_next(keylst);
-			verbose(2, "Looking at queue %s.", nxtkey);
+			verbose(2, "Looking at queue %s", nxtkey);
 			nxtq = map_get(pcore->queues, nxtkey);
-
+			verbose(2, "Size:  %d", nxtq->cursize);
 			if (nxtq->cursize == 0)
 			{
 				verbose(2, "Is empty.");
@@ -69,68 +61,57 @@ void *weightedFairScheduler(void *pc)
 			{
 				verbose(2, "entered minftime if\n");
 				savekey = nxtkey;
-				minftime = nxtq->ftime;
+				//verbose(2, "minftime was %f, setting it to %f\n", minftime, nxtq->ftime);
+				//minftime = nxtq->ftime;
 			}
 		}
 
 		//if (nxtq->cursize == 0) minftime = -1;
-	//	printf("ended loop\n");
 		list_release(keylst);
-	//	printf("released list\n");
 		// if savekey is NULL then release the lock..
 		if (savekey == NULL)
 		{
 			minftime = -1;
 			pcore -> vclock = -1;
-//			printf("savekey == NULL\n");
 			continue;
 		}
 		else
 		{
-	//		printf("Recalculating queue times\n");			
 //			verbose(1, "Scheduler looking at queue %s", savekey);
 			thisq = map_get(pcore->queues, savekey);
-//printf("1\n");	
 			int status = readQueue(thisq, (void **)&in_pkt, &pktsize);
 			if (status == EXIT_SUCCESS)
 			{
-//				printf("2\n");	
+				verbose(2, "picking from %s\n", savekey);
 				writeQueue(pcore->workQ, in_pkt, pktsize);			
-//				printf("3\n");	
 				pthread_mutex_lock(&(pcore->qlock));
-//				printf("4\n");	
 				pcore->packetcnt--;
-//				printf("5\n");	
 				pthread_mutex_unlock(&(pcore->qlock));
-//				printf("6\n");	
 			}
 			peekQueue(thisq, (void **)&nxt_pkt, &npktsize);
-//printf("7\n");	
 			if (npktsize)
 			{
-//				printf("Setting queue times\n");
-
-				thisq->stime = thisq->ftime;
-				thisq->ftime = thisq->stime + npktsize/(thisq->weight * 10000);
+				//thisq->stime = thisq->ftime;
+				double temp = thisq->ftime;
+				verbose(2,"processor: thisq->ftime was %f\n", thisq->ftime); 
+				thisq->ftime = thisq->ftime + ((double)npktsize)/thisq->weight;
+				verbose(2,"processor: thisq->ftime is now  %f\n", thisq->ftime);
+				thisq->stime = temp;
 			}
-//printf("8\n");	
 			minstime = thisq->stime;
 			tweight = 0.0;
-//printf("9\n");			
 			keylst = map_keys(pcore->queues);
 			while (list_has_next(keylst) == 1)
-			{//	printf("while 10\n");	
-
+			{
 				nxtkey = list_next(keylst);
 				nxtq = map_get(pcore->queues, nxtkey);
-				tweight += (nxtq->weight * 10000);
+				tweight += nxtq->weight;
 				if ((nxtq->cursize > 0) && (nxtq->stime < minstime))
 					minstime = nxtq->stime;
-		//		printf("end while 11\n");	
+				if (nxtq->ftime  > minftime)
+					minftime = nxtq->ftime;
 			}
-	//		printf("12\n");	
 			list_release(keylst);
-//printf("13\n");	
 			pcore->vclock = max(minstime, (pcore->vclock + ((double)pktsize)/tweight));
 		}
 	}
@@ -167,19 +148,21 @@ int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize)
 	if (thisq->cursize == 0)
 	{
 		verbose(2, "[weightedFairQueuer]:: inserting the first element.. ");
-		thisq->stime = max(pcore->vclock, thisq->ftime);
-		thisq->ftime = thisq->stime + pktsize/thisq->weight;
-
+		double temp = thisq->ftime;
+		//thisq->stime = max(pcore->vclock, thisq->ftime);
+		thisq->ftime = thisq->ftime + ((double)pktsize)/thisq->weight;
+		thisq->stime = max(pcore->vclock, temp);
+		verbose(2, "queue: thisq->ftime was %f but is now %f\n", temp, thisq->ftime);
 		minstime = thisq->stime;
 
 		keylst = map_keys(pcore->queues);
-		
+
 		while (list_has_next(keylst) == 1)
 		{
 			nxtkey = list_next(keylst);
 
 			nxtq = map_get(pcore->queues, nxtkey);
-			
+
 			if ((nxtq->cursize > 0) && (nxtq->stime < minstime))
 				minstime = nxtq->stime;
 		}
@@ -197,8 +180,8 @@ int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize)
 		pthread_mutex_unlock(&(pcore->qlock));
 		verbose(2, "[weightedfairqueuer]:: Adding packet.. ");
 		writeQueue(thisq, in_pkt, pktsize);
-		
-		
+
+
 	//	if (pcore->packetcnt == 1)
 	//		pthread_cond_signal(&(pcore->schwaiting));
 	//	pthread_mutex_unlock(&(pcore->qlock));
