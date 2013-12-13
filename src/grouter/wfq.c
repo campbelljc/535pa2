@@ -189,7 +189,7 @@ void *weightedFairScheduler(void *pc)
 		pcore->packetcnt--;
 		pthread_mutex_unlock(&(pcore->qlock));
 	
-		pcore->vclock += 1;
+		pcore->vclock += 1/pktsize;
 		thisq->weightAchieved += 1/pktsize; // fix for weight
 		if (pcore->vclock >= totalWeights)
 		{
