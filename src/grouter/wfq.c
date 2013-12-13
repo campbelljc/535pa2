@@ -18,7 +18,7 @@
 
 extern router_config rconfig;
 
-void *weightedFairScheduler(void *pc)
+/*void *weightedFairScheduler(void *pc)
 {
 	pktcore_t *pcore = (pktcore_t *)pc;
 	List *keylst;
@@ -117,10 +117,9 @@ void *weightedFairScheduler(void *pc)
 			pcore->vclock = max(minstime, (pcore->vclock + ((double)pktsize)/tweight));
 		}
 	}
-}
+}*/
 
 
-/*
 void *weightedFairScheduler(void *pc)
 {
 	pktcore_t *pcore = (pktcore_t *)pc;
@@ -173,7 +172,6 @@ void *weightedFairScheduler(void *pc)
 			if (nxtq->weightAchieved < nxtq->weight)
 			{
 				savekey = nxtkey;
-				nxtq->weightAchieved += 1; // fix for weight
 				break;
 			}
 		}
@@ -192,6 +190,7 @@ void *weightedFairScheduler(void *pc)
 		pthread_mutex_unlock(&(pcore->qlock));
 	
 		pcore->vclock += 1;
+		thisq->weightAchieved += 1/pktsize; // fix for weight
 		if (pcore->vclock >= totalWeights)
 		{
 			pcore->vclock = 0;
@@ -204,7 +203,7 @@ void *weightedFairScheduler(void *pc)
 			list_release(keylst);
 		}
 	}
-} */
+} 
 
 
 // WCWeightFairQueuer: function called by the classifier to enqueue
