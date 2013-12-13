@@ -40,7 +40,7 @@ typedef struct _simplequeue_t
 	char qdisc[MAX_NAME_LEN];
 	double delay_us;
 	// following parameters are useful for scheduling algorithms
-	double weight;
+	double weight, weightAchieved;
 	double stime, ftime;
 	// following parameters are useful for RED
 	double minval, maxval, pmaxval;
