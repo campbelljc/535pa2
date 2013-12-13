@@ -184,13 +184,17 @@ void *weightedFairScheduler(void *pc)
 		thisq = map_get(pcore->queues, savekey);
 
 		int status = readQueue(thisq, (void **)&in_pkt, &pktsize);
-		writeQueue(pcore->workQ, in_pkt, pktsize);			
-		pthread_mutex_lock(&(pcore->qlock));
-		pcore->packetcnt--;
-		pthread_mutex_unlock(&(pcore->qlock));
+		if (status == EXIT_SUCCESS)
+		{
+			writeQueue(pcore->workQ, in_pkt, pktsize);			
+			pthread_mutex_lock(&(pcore->qlock));
+			pcore->packetcnt--;
+			pthread_mutex_unlock(&(pcore->qlock));
 	
-		pcore->vclock += 1/pktsize;
-		thisq->weightAchieved += 1/pktsize; // fix for weight
+			pcore->vclock += 1/pktsize;
+			thisq->weightAchieved += 1/pktsize;
+		}
+		
 		if (pcore->vclock >= totalWeights)
 		{
 			pcore->vclock = 0;
