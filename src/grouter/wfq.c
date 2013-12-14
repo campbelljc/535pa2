@@ -213,7 +213,7 @@ void *weightedFairScheduler(void *pc)
 // WCWeightFairQueuer: function called by the classifier to enqueue
 // the packets.. 
 // TODO: Debug this function...
-int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize)
+/*int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize)
 {
 	char *qkey = tagPacket(pcore, in_pkt);
 	simplequeue_t *thisq, *nxtq;
@@ -275,6 +275,67 @@ int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize)
 	//	if (pcore->packetcnt == 1)
 	//		pthread_cond_signal(&(pcore->schwaiting));
 	//	pthread_mutex_unlock(&(pcore->qlock));
+		return EXIT_SUCCESS;
+	} else if (thisq->cursize < thisq->maxsize)
+	{
+		// insert packet and setup variables..
+		writeQueue(thisq, in_pkt, pktsize);
+		verbose(2, "[weightedfairqueuer]:: Adding packet.. ");
+		pcore->packetcnt++;
+		pthread_mutex_unlock(&(pcore->qlock));
+		return EXIT_SUCCESS;
+	} else {
+		verbose(1, "[weightedFairQueuer]:: Packet dropped.. Queue for %s is full ", qkey);
+		pthread_mutex_unlock(&(pcore->qlock));
+		free(in_pkt);
+		return EXIT_SUCCESS;
+	}
+}*/
+
+int weightedFairQueuer(pktcore_t *pcore, gpacket_t *in_pkt, int pktsize)
+{
+	char *qkey = tagPacket(pcore, in_pkt);
+	simplequeue_t *thisq, *nxtq;
+	double minftime, minstime, tweight;
+	List *keylst;
+	char *nxtkey, *savekey;
+
+	verbose(2, "[weightedFairQueuer]:: Worst-case weighted fair queuing scheduler processing packet w/key %s", qkey);
+
+	pthread_mutex_lock(&(pcore->qlock));
+
+	thisq = map_get(pcore->queues, qkey);
+	if (thisq == NULL)
+	{
+		fatal("[weightedFairQueuer]:: Invalid %s key presented for queue addition", qkey);
+		pthread_mutex_unlock(&(pcore->qlock));
+		free(in_pkt);
+		return EXIT_FAILURE;             // packet dropped..
+	}
+
+//	printf("Checking the queue size \n");
+	if (thisq->cursize == 0)
+	{
+		verbose(2, "[weightedFairQueuer]:: inserting the first element.. ");
+
+		keylst = map_keys(pcore->queues);
+
+		while (list_has_next(keylst) == 1)
+		{
+			nxtkey = list_next(keylst);
+
+			nxtq = map_get(pcore->queues, nxtkey);
+		}
+		list_release(keylst);
+
+		// insert the packet... and increment variables..
+		// wake up scheduler if it was waiting..
+		pcore->packetcnt++;
+		if (pcore->packetcnt == 1)
+			pthread_cond_signal(&(pcore->schwaiting)); // wake up scheduler if it was waiting..
+		pthread_mutex_unlock(&(pcore->qlock));
+		verbose(2, "[weightedfairqueuer]:: Adding packet.. ");
+		writeQueue(thisq, in_pkt, pktsize);
 		return EXIT_SUCCESS;
 	} else if (thisq->cursize < thisq->maxsize)
 	{
