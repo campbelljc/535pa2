@@ -1,6 +1,7 @@
 #include <slack/std.h>
 #include <slack/map.h>
 #include <slack/list.h>
+#include <float.h>
 #include <pthread.h>
 #include "protocols.h"
 #include "packetcore.h"
@@ -126,7 +127,7 @@ void *weightedFairScheduler(void *pc)
 	List *keylst;
 	simplequeue_t *nxtq, *thisq;
 	char *nxtkey, *savekey;
-	double tweight;
+	double tweight = 1;
 	int pktsize, npktsize;
 	gpacket_t *in_pkt, *nxt_pkt;
 
@@ -145,16 +146,15 @@ void *weightedFairScheduler(void *pc)
 		pthread_mutex_unlock(&(pcore->qlock));
 
 		pthread_testcancel();
-		
-		int totalWeights = 0;
-		keylst = map_keys(pcore->queues);
-		while (list_has_next(keylst) == 1)
-		{
-			nxtkey = list_next(keylst);
-			nxtq = map_get(pcore->queues, nxtkey);
-			totalWeights += nxtq->weight;
-		}
-		list_release(keylst);
+
+		//keylst = map_keys(pcore->queues);
+		//while (list_has_next(keylst) == 1)
+		//{
+		//	nxtkey = list_next(keylst);
+		//	nxtq = map_get(pcore->queues, nxtkey);
+		//	totalWeights += nxtq->weight;
+		//}
+		//list_release(keylst);
 
 		keylst = map_keys(pcore->queues);
 		while (list_has_next(keylst) == 1)
@@ -168,8 +168,8 @@ void *weightedFairScheduler(void *pc)
 				verbose(2, "Is empty.");
 				continue;
 			}
-			
-			if (nxtq->weightAchieved < nxtq->weight)
+
+			if (nxtq->weightAchieved < tweight) 
 			{
 				savekey = nxtkey;
 				break;
@@ -179,6 +179,17 @@ void *weightedFairScheduler(void *pc)
 
 		if (savekey == NULL)
 		{
+			printf("savekey == null for some reason, resetting\n");
+			//if theres no queue to select, restart everything
+			tweight = 1;
+			keylst = map_keys(pcore->queues);
+                	while (list_has_next(keylst) == 1)
+                	{
+                	      nxtkey = list_next(keylst);
+                	      nxtq = map_get(pcore->queues, nxtkey);
+                	      nxtq->weightAchieved = 0;
+                	}
+                	list_release(keylst);
 			continue;
 		}
 		thisq = map_get(pcore->queues, savekey);
@@ -186,26 +197,43 @@ void *weightedFairScheduler(void *pc)
 		int status = readQueue(thisq, (void **)&in_pkt, &pktsize);
 		if (status == EXIT_SUCCESS)
 		{
-			writeQueue(pcore->workQ, in_pkt, pktsize);			
+			printf("picking from queue %s\n", savekey);
+			printf("thisq->weightAchieved = %f , totalWeights = %f\n", thisq->weightAchieved, tweight);
+			writeQueue(pcore->workQ, in_pkt, pktsize);
 			pthread_mutex_lock(&(pcore->qlock));
 			pcore->packetcnt--;
 			pthread_mutex_unlock(&(pcore->qlock));
-	
-			pcore->vclock += 1/pktsize;
-			thisq->weightAchieved += 1/pktsize;
+			//pcore->vclock += 1/pktsize;
+			thisq->weightAchieved += ((double)pktsize)/thisq->weight;
 		}
-		
-		if (pcore->vclock >= totalWeights)
-		{
-			pcore->vclock = 0;
-			while (list_has_next(keylst) == 1)
-			{
-				nxtkey = list_next(keylst);
-				nxtq = map_get(pcore->queues, nxtkey);
-				nxtq->weightAchieved = 0;
-			}
-			list_release(keylst);
+
+		if (thisq->weightAchieved > tweight){
+			tweight = thisq->weightAchieved;
 		}
+
+		if (thisq->weightAchieved == DBL_MAX || tweight == DBL_MAX){ //if anything is maxed out, restart the whole thing
+                        tweight = 1;
+                        keylst = map_keys(pcore->queues);
+                        while (list_has_next(keylst) == 1)
+                        {
+                              nxtkey = list_next(keylst);
+                              nxtq = map_get(pcore->queues, nxtkey);
+                              nxtq->weightAchieved = 0;
+                        }
+                        list_release(keylst);
+		}
+
+		//if (pcore->vclock >= totalWeights)
+		//{
+		//	pcore->vclock = 0;
+		//	while (list_has_next(keylst) == 1)
+		//	{
+		//		nxtkey = list_next(keylst);
+		//		nxtq = map_get(pcore->queues, nxtkey);
+		//		nxtq->weightAchieved = 0;
+		//	}
+		//	list_release(keylst);
+		//}
 	}
 } 
 
